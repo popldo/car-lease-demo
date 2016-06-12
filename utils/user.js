@@ -22,8 +22,8 @@ module.exports.setup = function (cert_auth, cb) {
         // Initialize the connector to the CA
         dataSource.settings = {
             host: cert_auth.api_host,
-            port: cert_auth.api_port_tls,
-            secure: true
+            port: cert_auth.api_port,
+            secure: false
         };
 
         console.log(TAG, "initializing ca connection to:", dataSource.settings.host, ":", dataSource.settings.port);

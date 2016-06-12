@@ -2,7 +2,9 @@
 /* global process */
 /* global __dirname */
 /*eslint-env node*/
-
+process.env.VCAP_APP_HOST = "http://127.0.0.1";
+process.env.VCAP_APP_PORT = 3000;
+process.env['NODE_PATH'] = "/usr/local/bin/node";
 /*******************************************************************************
  * Copyright (c) 2015 IBM Corp.
  *
@@ -42,6 +44,7 @@ var configFile 		= require(__dirname+'/Server_Side/configurations/configuration.
 
 
 console.log(__dirname+'/Server_Side/blockchain/blocks/block/block.js')
+
 
 //// Set Server Parameters ////
 var host = process.env.VCAP_APP_HOST;
@@ -303,7 +306,7 @@ app.use(function (err, req, res, next) {		// = development error handler, print 
 });
 
 // Track the application deployments
-require("cf-deployment-tracker-client").track();
+//require("cf-deployment-tracker-client").track();
 
 // ============================================================================================================================
 // 														Launch Webserver
@@ -318,7 +321,7 @@ server.timeout = 2400000;																// Ta-da.
 console.log('------------------------------------------ Server Up - ' + host + ':' + port + ' ------------------------------------------');
 
 // Track the application deployments
-require("cf-deployment-tracker-client").track();
+//require("cf-deployment-tracker-client").track();
 
 // ==================================
 // load peers manually or from VCAP, VCAP will overwrite hardcoded list!
@@ -342,36 +345,6 @@ if (manual.credentials.ca) {
     var ca_name = Object.keys(manual.credentials.ca)[0];
     console.log(TAG, "loading ca:", ca_name);
     ca = manual.credentials.ca[ca_name];
-}
-
-if (process.env.VCAP_SERVICES) {															//load from vcap, search for service, 1 of the 3 should be found...
-    var servicesObject = JSON.parse(process.env.VCAP_SERVICES);
-    for (var i in servicesObject) {
-        if (i.indexOf('ibm-blockchain') >= 0) {											// looks close enough (can be suffixed dev, prod, or staging)
-            if (servicesObject[i][0].credentials.error) {
-                console.log('!\n!\n! Error from Bluemix: \n', servicesObject[i][0].credentials.error, '!\n!\n');
-                peers = null;
-                users = null;
-                process.error = {
-                    type: 'network',
-                    msg: "Due to overwhelming demand the IBM Blockchain Network service is at maximum capacity.  Please try recreating this service at a later date."
-                };
-            }
-            if (servicesObject[i][0].credentials && servicesObject[i][0].credentials.peers) {
-                console.log('overwritting peers, loading from a vcap service: ', i);
-                peers = servicesObject[i][0].credentials.peers;
-                var ca_name = Object.keys(servicesObject[i][0].credentials.ca)[0];
-                console.log(TAG, "loading ca:", ca_name);
-                ca = servicesObject[i][0].credentials.ca[ca_name];
-                if (servicesObject[i][0].credentials.users) {
-                    console.log('overwritting users, loading from a vcap service: ', i);
-                    users = servicesObject[i][0].credentials.users;
-                }
-                else users = null;														//no security
-                break;
-            }
-        }
-    }
 }
 
 console.log("ENV VARIABLES", configFile.config.api_ip, configFile.config.api_port_external);

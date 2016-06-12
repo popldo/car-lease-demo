@@ -1,18 +1,18 @@
 /*eslint-env node*/
-
+var fs 				= require("fs");
 var config = {};
 
 //Tracing
 config.trace = true;
 config.traceFile = __dirname+'/../logs/app_trace.log';
-
+var manual = JSON.parse(fs.readFileSync('mycreds.json', 'utf8'));
 //IP and port configuration
-config.api_ip = "http://"+JSON.parse(process.env.VCAP_SERVICES)["ibm-blockchain-5-prod"][0]["credentials"]["peers"][0]["api_host"];
+config.api_ip = manual["credentials"]["peers"][0]["api_host"];
 //When using blockchain on bluemix, api_port_external and api_port_internal will be the same
-config.api_port_external = JSON.parse(process.env.VCAP_SERVICES)["ibm-blockchain-5-prod"][0]["credentials"]["peers"][0]["api_port"]; //"3000";		//port number used when calling api from outside of the vagrant environment
-config.api_port_internal = 	JSON.parse(process.env.VCAP_SERVICES)["ibm-blockchain-5-prod"][0]["credentials"]["peers"][0]["api_port"]; //"5000";		//port number used when calling api from inside vagrant environment - generally used for chaincode calling out to api
+config.api_port_external = manual["credentials"]["peers"][0]["api_port"]; //"3000";		//port number used when calling api from outside of the vagrant environment
+config.api_port_internal = 	manual["credentials"]["peers"][0]["api_port"]; //"5000";		//port number used when calling api from inside vagrant environment - generally used for chaincode calling out to api
 
-config.app_url = 'http://'+JSON.parse(process.env.VCAP_APPLICATION)["application_uris"][0];
+config.app_url = 'http://'+manual["credentials"]["peers"]["api_url"];
 
 //Chaincode file locations
 config.vehicle_log = "https://github.com/jpayne23/Car-Lease-Demo/Chaincode/vehicle_log_code";

@@ -1,1 +1,4 @@
+*.log
+Server_Side/logs/
 launchConfigurations/
+node_modules/
